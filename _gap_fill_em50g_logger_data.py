@@ -1,4 +1,7 @@
 """
+NOTE: If you've downloaded the repository from Github, then you already
+    have the necessary directory hierarchy and can skips for setting them up.
+
 This script is used for gap-filling sensor data that comes off the Em50g data loggers
 made by Decagon (now Meter Group). It does this:
     1. Iterates through a directory that has multiple logger data files.
@@ -48,6 +51,7 @@ Note:
             b. Change data-types to numbers instead of strings. """
 
 # import packages
+import numpy as np
 import pandas as pd
 import os, shutil, glob
 
@@ -56,7 +60,7 @@ import os, shutil, glob
 ############# See Instructions Above for Setting up your Directories  ##########
 
 # path to where your raw em50g logger data resides ('raw-sensor-data')
-path_to_raw_data = r'C:\Users\jdext\Google Drive\sensor-data\raw-sensor-data'
+path_to_raw_data = r'C:\Users\jdext\Desktop\em50g-data-logger-gap-fill-tool\sensor-data\raw-sensor-data'
 
 # change working directory to: 'path_to_raw_data'
 os.chdir(path_to_raw_data)
@@ -152,6 +156,12 @@ for file in logger_files:
     
     # Left hand join using created time-series as series to join on.
     join_for_gap_filling = date_time_range.join(with_headers)
+
+    # remove '***' and replace with 'nan' (Not a Number(nan))
+    # the '***' are from the sensor data and are added by data logger software
+    join_for_gap_filling.replace('***', np.nan, inplace=True)  
+    
+    # reset index to prepare table for final processing steps
     join_for_gap_filling = join_for_gap_filling.reset_index()
     
     # change working directory to: 'intermediate-outputs'
